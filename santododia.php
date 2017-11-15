@@ -3,11 +3,11 @@
 /*
 Plugin Name: Santo do Dia
 Plugin URI: http://fellipesoares.com.br/wp-santododia
-Description: A brief description of the Plugin.
+Description: Widget com informação do Santo do Dia
 Version: 1.0
 Author: Fellipe Soares
 Author URI: http://fellipesoares.com.br
-License: A "Slug" license name e.g. GPL2
+License: GPL2
 */
 
 /**
@@ -57,9 +57,12 @@ class SantodoDia_Widget extends WP_Widget {
         extract( $args );
         $title = apply_filters( 'widget_title', $instance['title'] );
 
-        echo $before_widget;
+	    echo $args['before_widget'];
 
-        echo "<h2 class='widget-title'>Santo do Dia</h2>";
+	    $title = __("Santo do Dia",'SantodoDia_Widget');
+
+	    if ( ! empty( $title ) )
+		    echo $args['before_title'] . $title . $args['after_title'];
 
 	    // Fazer a consulta do Santo do Dia
 	    $dia = date( 'j' );
@@ -83,28 +86,18 @@ class SantodoDia_Widget extends WP_Widget {
 
 
 	    if ( $santo_do_dia->have_posts() ) {
-		    echo "<div>";
-		    echo "<ul style='list-style: none; clear: both;'>";
 	        while ( $santo_do_dia->have_posts() ) {
 		        $santo_do_dia->the_post();
-	            echo "<li style='float: left'><a href='" . get_post_permalink() . "' title='" . get_the_title() . "'>";
-                    the_post_thumbnail(array(80, 80), array('class' => 'alignleft'));
+	            echo "<div style='clear: both; margin-bottom: 30px'><a href='" . get_post_permalink() . "' title='" . get_the_title() . "'>";
+                    the_post_thumbnail(array(50, 50), array('class' => 'alignleft'));
                     echo get_the_title();
-                echo "</a></li>";
+                echo "</a></div>";
             }
-            echo "</ul>";
-		    echo "</div>";
 		    wp_reset_postdata();
         } else {
-		    echo "<div>";
 	        echo "Sem santo nesta data";
-		    echo "</div>";
         }
-
-
-        // wp_reset_query();	 // Restore global post data stomped by the_post().
-
-	    echo $after_widget;
+	    echo $args['after_widget'];
     }
 	    /**
      * Back-end widget form.
@@ -140,9 +133,11 @@ class SantodoDia_Widget extends WP_Widget {
      * @return array Updated safe values to be saved.
      */
     public function update( $new_instace, $old_instance) {
-
+	    $instance = array();
+	    $instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
+	    return $instance;
     }
 } // Classe SantodoDia_Widget
 
-// Register Foo_Widget widget
+// Register SantodoDia_Widget
 add_action( 'widgets_init', function() { register_widget( 'SantodoDia_Widget' ); } );
