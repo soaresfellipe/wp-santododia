@@ -59,11 +59,7 @@ class SantodoDia_Widget extends WP_Widget {
 
         echo $before_widget;
 
-        if ( $title ) {
-            echo $before_title . $title . $after_title;
-        }
-
-
+        echo "<h2 class='widget-title'>Santo do Dia</h2>";
 
 	    // Fazer a consulta do Santo do Dia
 	    $dia = date( 'j' );
