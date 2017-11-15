@@ -1,17 +1,24 @@
 # WP Santo do Dia
 
 Contributors: fellipesoares
+
 Donate link: https://fellipesoares.com.br/wp-santo-do-dia/
+
 Tags: catholic, saint
+
 Requires at least: 4.6
+
 Tested up to: 4.9
+
 Stable tag: 1.0.0
+
 License: GPLv2 or later
+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 WP Santo do Dia é um plugin do WordPress para apresentar através de um widget o Santo do Dia, conforme a Tradição Católica.
 
-## Description
+## Descrição
 
 WP Santo do Dia é um plugin do WordPress para apresentar através de um widget o Santo do Dia, conforme a Tradição Católica. Sua ativação adiciona um widget que apresenta o Santo do Dia.
 
@@ -21,12 +28,12 @@ Será exibido no widget o santo do dia e mês em que mesmo foi publicado, ou sej
 
 O plugin WP Santo do Dia não fornece as informações dos santos de cada dia, sendo necessária sua publicação.
 
-## Installation
+## Instalação
 
 1. Envie os arquivos do plugin para a pasta wp-content/plugins, ou instale usando o instalador de plugins do WordPress.
 2. Ative o plugin;
 
-## Frequently Asked Questions
+## F.A.Q. (Frequently Asked Questions)
 
 ### O plugin adiciona os santos automaticamente?
 
@@ -35,8 +42,8 @@ Não, é necessário incluir os santos manualmente. É um interesse adicionar os
 ## Screenshots
 
 1. Apresentação do widget [link](https://fellipesoares.com.br/wp-content/uploads/2017/11/santododia_widget-242x300.png)
-2. Menu do Custom Post Type nomeado Santo [link] (https://fellipesoares.com.br/wp-content/uploads/2017/11/santo_menu.png)
-3. Tela para adicionar um santo [link] (https://fellipesoares.com.br/wp-content/uploads/2017/11/santo_adicionar-700x295.png)
+2. Menu do Custom Post Type nomeado Santo [link](https://fellipesoares.com.br/wp-content/uploads/2017/11/santo_menu.png)
+3. Tela para adicionar um santo [link](https://fellipesoares.com.br/wp-content/uploads/2017/11/santo_adicionar-700x295.png)
 
 ### Changelog
 
