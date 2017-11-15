@@ -22,7 +22,7 @@ function santo_custom_post_type() {
             ],
             'public'        => true,
             'has_archive'   => true,
-            'supports'      => array( 'title','editor','custom-fields','thumbnail','excerpt' ),
+            'supports'      => array( 'title','editor','custom-fields','thumbnail' ),
             'rewrite'       => ['slug' => 'santo'] // slug custom
         ]);
 }
@@ -88,7 +88,7 @@ class SantodoDia_Widget extends WP_Widget {
 	    if ( $santo_do_dia->have_posts() ) {
 	        while ( $santo_do_dia->have_posts() ) {
 		        $santo_do_dia->the_post();
-	            echo "<div style='clear: both; margin-bottom: 30px'><a href='" . get_post_permalink() . "' title='" . get_the_title() . "'>";
+	            echo "<div style='clear: both; margin-bottom: 40px'><a href='" . get_post_permalink() . "' title='" . get_the_title() . "'>";
                     the_post_thumbnail(array(50, 50), array('class' => 'alignleft'));
                     echo get_the_title();
                 echo "</a></div>";
