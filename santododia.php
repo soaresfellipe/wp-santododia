@@ -14,7 +14,7 @@ License: A "Slug" license name e.g. GPL2
  * Criação do CPT Santo do Dia
  */
 function santo_custom_post_type() {
-    register_post_type('santo_do_dia',
+    register_post_type('santo',
         [
             'labels' => [
                 'name'          => __('Santos'),
@@ -22,6 +22,7 @@ function santo_custom_post_type() {
             ],
             'public'        => true,
             'has_archive'   => true,
+            'supports'      => array( 'title','editor','custom-fields','thumbnail','excerpt' ),
             'rewrite'       => ['slug' => 'santo'] // slug custom
         ]);
 }
@@ -39,7 +40,7 @@ class SantodoDia_Widget extends WP_Widget {
     public function __construct() {
         parent::__construct(
             'santododia_widget', // ID Base
-            'Santododia_Widget', // Nome
+            'SantodoDia_Widget', // Nome
             array( 'description' => __('Widget do Santo do Dia','text_domain'), ) // Args
         );
     }
@@ -57,14 +58,59 @@ class SantodoDia_Widget extends WP_Widget {
         $title = apply_filters( 'widget_title', $instance['title'] );
 
         echo $before_widget;
-        if ( ! empty( $title ) ) {
+
+        if ( $title ) {
             echo $before_title . $title . $after_title;
         }
-        echo __( 'Hello World', 'text-domain' );
-        echo $after_widget;
-    }
 
-    /**
+
+
+	    // Fazer a consulta do Santo do Dia
+	    $dia = date( 'j' );
+        $mes = date('n');
+	    $args = array(
+		    'posts_per_page'   => 5,
+		    'offset'           => 0,
+		    'orderby'          => 'date',
+		    'order'            => 'DESC',
+		    'post_type'        => 'santo',
+		    'post_status'      => 'publish',
+		    'date_query'       => array(array(
+			    'month' => $mes,
+			    'day' => $dia,
+		    ),),
+		    'suppress_filters' => true
+	    );
+
+	    // query
+	    $santo_do_dia = new WP_Query( $args );
+
+
+	    if ( $santo_do_dia->have_posts() ) {
+		    echo "<div>";
+		    echo "<ul style='list-style: none; clear: both;'>";
+	        while ( $santo_do_dia->have_posts() ) {
+		        $santo_do_dia->the_post();
+	            echo "<li style='float: left'><a href='" . get_post_permalink() . "' title='" . get_the_title() . "'>";
+                    the_post_thumbnail(array(80, 80), array('class' => 'alignleft'));
+                    echo get_the_title();
+                echo "</a></li>";
+            }
+            echo "</ul>";
+		    echo "</div>";
+		    wp_reset_postdata();
+        } else {
+		    echo "<div>";
+	        echo "Sem santo nesta data";
+		    echo "</div>";
+        }
+
+
+        // wp_reset_query();	 // Restore global post data stomped by the_post().
+
+	    echo $after_widget;
+    }
+	    /**
      * Back-end widget form.
      *
      * @see WP_Widget::form()
@@ -72,20 +118,21 @@ class SantodoDia_Widget extends WP_Widget {
      * @param array $instance Previously saved values from database.
      */
     public function form( $instance ) {
-        if ( isset( $instance[ 'title' ] ) ) {
-            $title = $instance[ 'title' ];
-        }
-        else {
-            $title = __( 'Santo do Dia', 'text_domain' );
-        }
-        ?>
+	    if ( isset( $instance['title'] ) ) {
+		    $title = $instance['title'];
+	    } else {
+		    $title = __( 'Santo do Dia', 'text_domain' );
+	    }
+
+	    ?>
         <p>
             <label for="<?php echo $this->get_field_name( 'title' ); ?>"><?php _e( 'Título:' ); ?></label>
-            <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $title ); ?>" />
+            <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>"
+                   name="<?php echo $this->get_field_name( 'title' ); ?>" type="text"
+                   value="<?php echo esc_attr( $title ); ?>"/>
         </p>
-        <?php
+	    <?php
     }
-
     /**
      * Sanitize widget form values as they are saved.
      *
