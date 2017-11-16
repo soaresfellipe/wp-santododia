@@ -2,11 +2,11 @@
 
 /*
 Plugin Name: Santo do Dia
-Plugin URI: http://fellipesoares.com.br/wp-santododia
+Plugin URI: https://fellipesoares.com.br/wp-santo-do-dia
 Description: Widget com informação do Santo do Dia
-Version: 1.0
+Version: 1.1
 Author: Fellipe Soares
-Author URI: http://fellipesoares.com.br
+Author URI: https://fellipesoares.com.br
 License: GPL2
 */
 
@@ -89,8 +89,13 @@ class SantodoDia_Widget extends WP_Widget {
 	        while ( $santo_do_dia->have_posts() ) {
 		        $santo_do_dia->the_post();
 	            echo "<div style='clear: both; margin-bottom: 40px'><a href='" . get_post_permalink() . "' title='" . get_the_title() . "'>";
-                    the_post_thumbnail(array(50, 50), array('class' => 'alignleft'));
-                    echo get_the_title();
+	            // Verifico se existe thumbnail para o post
+                if ( has_post_thumbnail() ) {
+	                the_post_thumbnail(array(50, 50), array('class' => 'alignleft'));
+                } else {
+                    echo_first_image( get_the_ID() );
+                }
+		        echo get_the_title();
                 echo "</a></div>";
             }
 		    wp_reset_postdata();
@@ -138,6 +143,31 @@ class SantodoDia_Widget extends WP_Widget {
 	    return $instance;
     }
 } // Classe SantodoDia_Widget
+
+/*
+ * Esta função retorna a primeira imagem associada ao post
+ * Source: https://codex.wordpress.org/Function_Reference/get_children#Show_the_first_image_associated_with_the_post
+ */
+function echo_first_image( $postID ) {
+	$args = array(
+		'numberposts' => 1,
+		'order' => 'ASC',
+		'post_mime_type' => 'image',
+		'post_parent' => $postID,
+		'post_status' => null,
+		'post_type' => 'attachment',
+	);
+
+	$attachments = get_children( $args );
+
+	if ( $attachments ) {
+		foreach ( $attachments as $attachment ) {
+			$image_attributes = wp_get_attachment_image_src( $attachment->ID, 'thumbnail' )  ? wp_get_attachment_image_src( $attachment->ID, 'thumbnail' ) : wp_get_attachment_image_src( $attachment->ID, 'full' );
+
+			echo '<img class="alignleft wp-post-image" height="50" width="50" src="' . wp_get_attachment_thumb_url( $attachment->ID ) . '" class="current">';
+		}
+	}
+}
 
 // Register SantodoDia_Widget
 add_action( 'widgets_init', function() { register_widget( 'SantodoDia_Widget' ); } );
