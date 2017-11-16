@@ -4,7 +4,7 @@
 Plugin Name: Santo do Dia
 Plugin URI: https://fellipesoares.com.br/wp-santo-do-dia
 Description: Widget com informação do Santo do Dia
-Version: 1.0
+Version: 1.1
 Author: Fellipe Soares
 Author URI: https://fellipesoares.com.br
 License: GPL2
