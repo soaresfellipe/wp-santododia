@@ -5,7 +5,7 @@ Donate link: https://fellipesoares.com.br/wp-santo-do-dia/
 Tags: catholic, saint
 Requires at least: 4.6
 Tested up to: 4.9
-Stable tag: 1.0.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,14 +40,13 @@ Não, é necessário incluir os santos manualmente. É um interesse adicionar os
 
 == Changelog ==
 
-= 1.0.0 =
+= 1.1 =
+* Novo: Widget considera a primeira imagem do post caso não seja definida imagem destacada
+
+= 1.0 =
 * Versão inicial do plugin
 
 == Upgrade Notice ==
 
 
 == Arbitrary section ==
-
-You may provide arbitrary sections, in the same format as the ones above.  This may be of use for extremely complicated
-plugins where more information needs to be conveyed that doesn't fit into the categories of "description" or
-"installation."  Arbitrary sections will be shown below the built-in sections outlined above.

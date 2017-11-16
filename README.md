@@ -10,7 +10,7 @@ Requires at least: 4.6
 
 Tested up to: 4.9
 
-Stable tag: 1.0.0
+Stable tag: 1.1
 
 License: GPLv2 or later
 
@@ -47,7 +47,10 @@ Não, é necessário incluir os santos manualmente. É um interesse adicionar os
 
 ### Changelog
 
-#### 1.0.0
+#### 1.1
+* Novo: Widget considera a primeira imagem do post caso não seja definida imagem destacada
+
+#### 1.0
 * Versão inicial do plugin
 
 ### Upgrade Notice
