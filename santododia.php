@@ -25,6 +25,7 @@ function santo_custom_post_type() {
             'supports'      => array( 'title','editor','custom-fields','thumbnail' ),
             'rewrite'       => ['slug' => 'santo'] // slug custom
         ]);
+    flush_rewrite_rules();
 }
 
 add_action('init','santo_custom_post_type');
