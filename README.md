@@ -47,6 +47,9 @@ Não, é necessário incluir os santos manualmente. É um interesse adicionar os
 
 ### Changelog
 
+#### 1.1.1
+* Bug: Links permanentes do CPT resultavam em página 404 ao instalar o plugin
+
 #### 1.1
 * Novo: Widget considera a primeira imagem do post caso não seja definida imagem destacada
 
