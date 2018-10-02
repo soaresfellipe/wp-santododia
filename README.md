@@ -39,6 +39,10 @@ O plugin WP Santo do Dia não fornece as informações dos santos de cada dia, s
 
 Não, é necessário incluir os santos manualmente. É um interesse adicionar os santos já na instalação futuramente.
 
+### Como colaborar com o projeto?
+
+Entre em contato comigo por email: falecom [at] fellipesoares.com.br
+
 ## Screenshots
 
 1. Apresentação do widget [link](https://fellipesoares.com.br/wp-content/uploads/2017/11/santododia_widget-242x300.png)
