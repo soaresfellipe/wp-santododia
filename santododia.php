@@ -3,172 +3,106 @@
 /*
 Plugin Name: Santo do Dia
 Plugin URI: https://fellipesoares.com.br/wp-santo-do-dia
-Description: Widget com informação do Santo do Dia
-Version: 1.1
+Description: Exiba o Santo do dia através de um shortcode [santododia]
+Version: 2.0
 Author: Fellipe Soares
 Author URI: https://fellipesoares.com.br
 License: GPL2
 */
 
-/**
- * Criação do CPT Santo do Dia
- */
-function santo_custom_post_type() {
-    register_post_type('santo',
-        [
-            'labels' => [
-                'name'          => __('Santos'),
-                'singular_name' => __('Santo')
-            ],
-            'public'        => true,
-            'has_archive'   => true,
-            'supports'      => array( 'title','editor','custom-fields','thumbnail' ),
-            'rewrite'       => ['slug' => 'santo'] // slug custom
-        ]);
-    flush_rewrite_rules();
+// Os dados dos santos serão utilizados do site santo.app.br
+// Eles serão obtidos através de JSON (https://santo.app.br/wp-json/wp/v2/santo)
+// Exemplo de chamada: https://santo.app.br/wp-json/wp/v2/santo?dia=3&mes=1
+
+// Durante a instalação do plugin, crio uma tabela para armazenar os dados do santo do dia,  evitando muitas requisições ao site santo.app.br
+// Os campos que deverão ser criados: id, dia, mes, nome, URL da imagem e URL do santo.app.br
+
+// Função para criar a tabela no banco de dados
+function santo_do_dia_install() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . "santo_do_dia";
+    $charset_collate = $wpdb->get_charset_collate();
+    $sql = "CREATE TABLE $table_name (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        dia tinyint(2) NOT NULL,
+        mes tinyint(2) NOT NULL,
+        nome varchar(255) NOT NULL,
+        imagem varchar(255) NOT NULL,
+        url varchar(255) NOT NULL,
+        PRIMARY KEY  (id)
+    ) $charset_collate;";
+    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    dbDelta( $sql );
+
+    // Executo a função para obter os dados do santo do dia
+    santo_do_dia_obter_dados();
 }
 
-add_action('init','santo_custom_post_type');
+register_activation_hook( __FILE__, 'santo_do_dia_install' );
 
-/**
- * Adiciona a Widget Santo do Dia
- */
-class SantodoDia_Widget extends WP_Widget {
-
-    /**
-     * Registro da Widget no WordPress
-     */
-    public function __construct() {
-        parent::__construct(
-            'santododia_widget', // ID Base
-            'SantodoDia_Widget', // Nome
-            array( 'description' => __('Widget do Santo do Dia','text_domain'), ) // Args
-        );
-    }
-
-    /**
-     * Front-end display of widget.
-     *
-     * @see WP_Widget::widget()
-     *
-     * @param array $args     Widget arguments.
-     * @param array $instance Saved values from database.
-     */
-    public function widget( $args, $instance ) {
-        extract( $args );
-        $title = apply_filters( 'widget_title', $instance['title'] );
-
-	    echo $args['before_widget'];
-
-	    $title = __("Santo do Dia",'SantodoDia_Widget');
-
-	    if ( ! empty( $title ) )
-		    echo $args['before_title'] . $title . $args['after_title'];
-
-	    // Fazer a consulta do Santo do Dia
-	    $dia = date( 'j' );
-        $mes = date('n');
-	    $args = array(
-		    'posts_per_page'   => 5,
-		    'offset'           => 0,
-		    'orderby'          => 'date',
-		    'order'            => 'DESC',
-		    'post_type'        => 'santo',
-		    'post_status'      => 'publish',
-		    'date_query'       => array(array(
-			    'month' => $mes,
-			    'day' => $dia,
-		    ),),
-		    'suppress_filters' => true
-	    );
-
-	    // query
-	    $santo_do_dia = new WP_Query( $args );
-
-
-	    if ( $santo_do_dia->have_posts() ) {
-	        while ( $santo_do_dia->have_posts() ) {
-		        $santo_do_dia->the_post();
-	            echo "<div style='clear: both; margin-bottom: 40px'><a href='" . get_post_permalink() . "' title='" . get_the_title() . "'>";
-	            // Verifico se existe thumbnail para o post
-                if ( has_post_thumbnail() ) {
-	                the_post_thumbnail(array(50, 50), array('class' => 'alignleft'));
-                } else {
-                    echo_first_image( get_the_ID() );
-                }
-		        echo get_the_title();
-                echo "</a></div>";
-            }
-		    wp_reset_postdata();
-        } else {
-	        echo "Sem santo nesta data";
-        }
-	    echo $args['after_widget'];
-    }
-	    /**
-     * Back-end widget form.
-     *
-     * @see WP_Widget::form()
-     *
-     * @param array $instance Previously saved values from database.
-     */
-    public function form( $instance ) {
-	    if ( isset( $instance['title'] ) ) {
-		    $title = $instance['title'];
-	    } else {
-		    $title = __( 'Santo do Dia', 'text_domain' );
-	    }
-
-	    ?>
-        <p>
-            <label for="<?php echo $this->get_field_name( 'title' ); ?>"><?php _e( 'Título:' ); ?></label>
-            <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>"
-                   name="<?php echo $this->get_field_name( 'title' ); ?>" type="text"
-                   value="<?php echo esc_attr( $title ); ?>"/>
-        </p>
-	    <?php
-    }
-    /**
-     * Sanitize widget form values as they are saved.
-     *
-     * @see WP_Widget::update()
-     *
-     * @param array $new_instance Values just sent to be saved.
-     * @param array $old_instance Previously saved values from database.
-     *
-     * @return array Updated safe values to be saved.
-     */
-    public function update( $new_instace, $old_instance) {
-	    $instance = array();
-	    $instance['title'] = ( ! empty( $new_instance['title'] ) ) ? strip_tags( $new_instance['title'] ) : '';
-	    return $instance;
-    }
-} // Classe SantodoDia_Widget
-
-/*
- * Esta função retorna a primeira imagem associada ao post
- * Source: https://codex.wordpress.org/Function_Reference/get_children#Show_the_first_image_associated_with_the_post
- */
-function echo_first_image( $postID ) {
-	$args = array(
-		'numberposts' => 1,
-		'order' => 'ASC',
-		'post_mime_type' => 'image',
-		'post_parent' => $postID,
-		'post_status' => null,
-		'post_type' => 'attachment',
-	);
-
-	$attachments = get_children( $args );
-
-	if ( $attachments ) {
-		foreach ( $attachments as $attachment ) {
-			$image_attributes = wp_get_attachment_image_src( $attachment->ID, 'thumbnail' )  ? wp_get_attachment_image_src( $attachment->ID, 'thumbnail' ) : wp_get_attachment_image_src( $attachment->ID, 'full' );
-
-			echo '<img class="alignleft wp-post-image" height="50" width="50" src="' . wp_get_attachment_thumb_url( $attachment->ID ) . '" class="current">';
-		}
-	}
+// Função para remover a tabela do banco de dados, caso o plugin seja desinstalado
+// Também é necessário remover o agendamento do cron (obter dados)
+function santo_do_dia_uninstall() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . "santo_do_dia";
+    $sql = "DROP TABLE IF EXISTS $table_name";
+    $wpdb->query($sql);
+    wp_clear_scheduled_hook('santo_do_dia_cron');
 }
 
-// Register SantodoDia_Widget
-add_action( 'widgets_init', function() { register_widget( 'SantodoDia_Widget' ); } );
+register_deactivation_hook( __FILE__, 'santo_do_dia_uninstall' );
+
+// Função para obter os dados do santo do dia e gravar na tabela
+function santo_do_dia_obter_dados() {
+
+    // Defino o timezone para Americas/Sao_Paulo
+    date_default_timezone_set('America/Sao_Paulo');
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . "santo_do_dia";
+    $dia = (int) date('d');
+    $mes = (int) date('m');
+    $url = "https://santo.app.br/wp-json/wp/v2/santo?dia=$dia&mes=$mes";
+    $json = file_get_contents($url);
+    $dados = json_decode($json);
+    $wpdb->insert($table_name, array(
+        'dia' => $dia,
+        'mes' => $mes,
+        'nome' => $dados[0]->title->rendered,
+        'imagem' => $dados[0]->imagem_destacada,
+        'url' => $dados[0]->link
+    ));
+}
+
+// A função de obter dados será executada todo dia, às 00:10
+function santo_do_dia_cron() {
+    if (!wp_next_scheduled('santo_do_dia_cron')) {
+        wp_schedule_event(time(), 'daily', 'santo_do_dia_cron');
+    }
+}
+
+// Função para exibir o santo do dia
+// Será exibido a imagem do santo, com link para o site santo.app.br
+// Abaixo da imagem, será exibido o nome do santo, com link para o site santo.app.br
+
+function santo_do_dia() {
+
+    // Defino o timezone para Americas/Sao_Paulo
+    date_default_timezone_set('America/Sao_Paulo');
+
+    global $wpdb;
+    $table_name = $wpdb->prefix . "santo_do_dia";
+    $dia = (int) date('d');
+    $mes = (int) date('m');
+    // Aplico parâmetros UTM em $url
+    // utm_source = domínio do site, utm_medium = plugin, utm_campaign = plugin_shortcode
+    $urlDoSite = $_SERVER['HTTP_HOST'];
+    $url = $url . "?utm_source=$urlDoSite&utm_medium=plugin&utm_campaign=plugin_shortcode";
+    $santo = $wpdb->get_row("SELECT * FROM $table_name WHERE dia = $dia AND mes = $mes");
+    $html = "<a href='$santo->url' target='_blank'><img src='$santo->imagem' alt='$santo->nome' /></a>";
+    $html .= "<p><a href='$santo->url' target='_blank'>$santo->nome</a></p>";
+    return $html;
+}
+
+// Adiciono o shortcode [santododia]
+add_shortcode('santododia', 'santo_do_dia');
