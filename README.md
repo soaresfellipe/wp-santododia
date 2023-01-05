@@ -8,36 +8,35 @@ Tags: catholic, saint
 
 Requires at least: 4.6
 
-Tested up to: 4.9
+Tested up to: 6.1.1
 
-Stable tag: 1.1
+Stable tag: 2.0
 
 License: GPLv2 or later
 
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-WP Santo do Dia é um plugin do WordPress para apresentar através de um widget o Santo do Dia, conforme a Tradição Católica.
+WP Santo do Dia é um plugin do WordPress para apresentar através de um shortcode o Santo do Dia, conforme a Tradição Católica.
 
 ## Descrição
 
 WP Santo do Dia é um plugin do WordPress para apresentar através de um widget o Santo do Dia, conforme a Tradição Católica. Sua ativação adiciona um widget que apresenta o Santo do Dia.
 
-A ativação do plugin criará um CPT (custom post type) “Santo”, onde é possível adicionar um Santo de uma determinada data. Você pode adicionar o nome do santo, uma descrição de sua história, e também uma imagem destacada para ser mostrada na página principal.
+A ativação do plugin irá adicionar uma tabela no banco de dados, que será atualizada diariamente com informações do site santo.app.br. Você poderá exibir as informações do Santo do dia por meio do shortcode `[santododia]`. Este shortcode contém uma imagem do Santo assim como o nome, ideal para exibição em barras verticais.
 
-Será exibido no widget o santo do dia e mês em que mesmo foi publicado, ou seja, é considerada como data do santo a data de publicação do post do tipo Santo. Observação: Como é considerado o dia e mês, não é necessário publicar novamente nos anos subsequentes.
-
-O plugin WP Santo do Dia não fornece as informações dos santos de cada dia, sendo necessária sua publicação.
+Será exibido no shortcode o santo do dia e mês atual.
 
 ## Instalação
 
 1. Envie os arquivos do plugin para a pasta wp-content/plugins, ou instale usando o instalador de plugins do WordPress.
-2. Ative o plugin;
+2. Ative o plugin.
+3. Recomendação: Se o seu site não recebe visitas diariamente, faça o agendamento do `wp-cron` para executar ao menos uma ver por dia.
 
 ## F.A.Q. (Frequently Asked Questions)
 
 ### O plugin adiciona os santos automaticamente?
 
-Não, é necessário incluir os santos manualmente. É um interesse adicionar os santos já na instalação futuramente.
+Sim, não é necessário realizar nenhum tipo de gerenciamento relacionado aos dados.
 
 ### Como colaborar com o projeto?
 
@@ -45,11 +44,12 @@ Entre em contato comigo por email: falecom [at] fellipesoares.com.br
 
 ## Screenshots
 
-1. Apresentação do widget [link](https://fellipesoares.com.br/wp-content/uploads/2017/11/santododia_widget-242x300.png)
-2. Menu do Custom Post Type nomeado Santo [link](https://fellipesoares.com.br/wp-content/uploads/2017/11/santo_menu.png)
-3. Tela para adicionar um santo [link](https://fellipesoares.com.br/wp-content/uploads/2017/11/santo_adicionar-700x295.png)
+
 
 ### Changelog
+
+#### 2.0
+* Melhoria: Remoção do modelo de CPT para consulta online da informação via API do santo.app.br
 
 #### 1.1.1
 * Bug: Links permanentes do CPT resultavam em página 404 ao instalar o plugin
@@ -61,6 +61,7 @@ Entre em contato comigo por email: falecom [at] fellipesoares.com.br
 * Versão inicial do plugin
 
 ### Upgrade Notice
+* A atualização para a versão 2.0 irá remover o CPT "Santo".
 
 
 ### Arbitrary section
