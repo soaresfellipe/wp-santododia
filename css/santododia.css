@@ -1,0 +1,28 @@
+/* Estilos CSS para o plugin Santo do Dia */
+.santo-do-dia-container {
+    text-align: center;
+}
+
+.santo-do-dia-container h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.santo-do-dia-card {
+    border: 2px solid #ccc;
+    padding: 10px;
+    display: inline-block;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.santo-do-dia-card img {
+    max-width: 100%;
+    border-radius: 6px;
+}
+
+.santo-do-dia-card p {
+    margin: 10px 0;
+}
+
+/* Ajuste os estilos conforme necessário para corresponder ao design do seu site */
