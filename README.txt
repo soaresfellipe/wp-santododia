@@ -1,86 +1,88 @@
-=== WP Santo do Dia ===
+=== Santo do Dia ===
 
 Contributors: fellipesoares
 Donate link: https://fellipesoares.com.br/wp-santo-do-dia/
 Tags: catholic, saint
-Requires at least: 4.6
-Tested up to: 6.8
-Stable tag: 2.1
+Requires at least: 6.3
+Tested up to: 7.0
+Requires PHP: 7.4
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-WP Santo do Dia é um plugin do WordPress para apresentar através de um shortcode o Santo do Dia, conforme a Tradição Católica.
+Display the Catholic saint of the day anywhere on your site with the [santododia] shortcode.
 
 == Description ==
 
-WP Santo do Dia é um plugin do WordPress para apresentar através de um widget o Santo do Dia, conforme a Tradição Católica. Sua ativação adiciona um widget que apresenta o Santo do Dia.
+WP Santo do Dia displays the Catholic saint for the current day and month.
 
-A ativação do plugin irá adicionar uma tabela no banco de dados, que será atualizada diariamente com informações do site https://catolicoapp.com. Você poderá exibir as informações do Santo do dia por meio do shortcode `[santododia]`. Este shortcode contém uma imagem do Santo assim como o nome, ideal para exibição em barras verticais.
-
-Será exibido no shortcode o santo do dia e mês atual.
+The plugin creates a small database table and updates it daily with information from https://catolicoapp.com. Add the `[santododia]` shortcode to a post, page, or widget area to display the saint's name and image.
 
 == Installation ==
 
-1. Envie os arquivos do plugin para a pasta wp-content/plugins, ou instale usando o instalador de plugins do WordPress.
-2. Ative o plugin.
-3. Recomendação: Se o seu site não recebe visitas diariamente, faça o agendamento do `wp-cron` para executar ao menos uma ver por dia.
+1. Upload the plugin files to the `wp-content/plugins/santo-do-dia` directory, or install the plugin through the WordPress plugins screen.
+2. Activate the plugin through the Plugins screen.
+3. Add the `[santododia]` shortcode where the card should appear.
+4. If the site receives no daily traffic, configure the system scheduler to trigger `wp-cron.php` at least once per day.
 
 == Frequently Asked Questions ==
 
-= O plugin adiciona os santos automaticamente? =
+= Does the plugin add the saints automatically? =
 
-Sim, não é necessário realizar nenhum tipo de gerenciamento relacionado aos dados.
+Yes. No manual content management is required.
 
-= Como faço para exibir o santo do dia no meu site? =
+= How do I display the saint of the day? =
 
-Basta adicionar o shortcode [santododia] em qualquer lugar do seu site.
+Add the `[santododia]` shortcode to any supported content area.
 
 == Changelog ==
 
+= 2.2.0 =
+* Validated compatibility with WordPress 7.0 and PHP 7.4 or later.
+* Fixed the daily update event and added automatic upgrades for existing installations.
+* Strengthened API response validation and unavailable-data handling.
+* Preserved plugin data on deactivation and moved destructive cleanup to uninstall.
+* Added output escaping, safer external links, and HTTP request limits.
+* Added automated tests and continuous integration.
+
 = 2.1.0 =
-* Melhorias de Performance e Otimização de Carregamento da Página
+* Improved performance and page-loading behavior.
 
 = 2.0.9 =
-* Melhoria: Atualização da URL exibida no card do santo do dia
+* Updated the URL displayed in the saint card.
 
 = 2.0.8 =
-* Melhoria: Atualização da API para CatolicoApp
+* Updated the API integration to CatolicoApp.
 
 = 2.0.7 =
-* Bug: Substituição da função get_file_contents por cUrl
+* Replaced direct file retrieval with an HTTP request.
 
 = 2.0.6 =
-* Bug: Correção de problemas no versionamento
+* Fixed versioning issues.
 
 = 2.0.5 =
-* Bug: Correção de problema no arquivo CSS
+* Fixed the stylesheet.
 
 = 2.0.4 =
-* Melhoria: Adicionada folha de estilos CSS para melhor exibição do widget/shortcode
+* Added a stylesheet for the shortcode card.
 
 = 2.0.3 =
-* Bug: Correção de problemas no agendamento da tarefa de obter dados da API
+* Fixed API update scheduling.
 
 = 2.0.2 =
-* Melhoria: Adicionadas classes CSS na imagem e título do Santo.
+* Added CSS classes to the image and title.
 
 = 2.0.1 =
-* Bug: Corrigida a frequência de verificação para de hora em hora
-        Implementada uma condição para somente buscar na API se o registro não estiver gravado na tabela
+* Changed the verification frequency and avoided duplicate API requests.
 
 = 2.0 =
-* Melhoria: Remoção do modelo de CPT para consulta online da informação via API do santo.app.br
+* Replaced the custom post type with online API data.
 
 = 1.1.1 =
-* Bug: Links permanentes do CPT resultavam em página 404 ao instalar o plugin
+* Fixed custom post type permalinks returning 404 pages.
 
 = 1.1 =
-* Novo: Widget considera a primeira imagem do post caso não seja definida imagem destacada
+* Added support for the first post image when no featured image exists.
 
 = 1.0 =
-* Versão inicial do plugin
-
-== Upgrade Notice ==
-* A atualização para a versão 2.0 irá remover o CPT "Santo".
-
-== Arbitrary section ==
+* Initial release.

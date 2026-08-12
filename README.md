@@ -3,9 +3,10 @@
 Contributors: fellipesoares
 Donate link: https://fellipesoares.com.br/wp-santo-do-dia/
 Tags: catholic, saint
-Requires at least: 4.6
-Tested up to: 6.8
-Stable tag: 2.1
+Requires at least: 6.3
+Tested up to: 7.0
+Requires PHP: 7.4
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +14,7 @@ WP Santo do Dia é um plugin do WordPress para apresentar através de um shortco
 
 ## Descrição
 
-WP Santo do Dia é um plugin do WordPress para apresentar através de um widget o Santo do Dia, conforme a Tradição Católica. Sua ativação adiciona um widget que apresenta o Santo do Dia.
+WP Santo do Dia é um plugin do WordPress para apresentar através de um shortcode o Santo do Dia, conforme a Tradição Católica.
 
 A ativação do plugin irá adicionar uma tabela no banco de dados, que será atualizada diariamente com informações do site santo.app.br. Você poderá exibir as informações do Santo do dia por meio do shortcode `[santododia]`. Este shortcode contém uma imagem do Santo assim como o nome, ideal para exibição em barras verticais.
 
@@ -40,6 +41,13 @@ Entre em contato comigo por email: falecom [at] fellipesoares.com.br
 
 
 ### Changelog
+
+#### 2.2.0
+* Compatibilidade validada com WordPress 7.0 e PHP 7.4 ou superior.
+* Corrigido o evento de atualização diária e adicionada atualização automática para instalações existentes.
+* Reforçada a validação das respostas da API e o tratamento quando os dados estão indisponíveis.
+* Dados passam a ser removidos somente na desinstalação, não mais na desativação.
+* Adicionados escaping, proteção de links externos e limites para requisições HTTP.
 
 #### 2.1
 * Melhorias de Performance e Otimização de Carregamento da Página
