@@ -1,0 +1,41 @@
+{
+    "name": "soaresfellipe/wp-santododia",
+    "description": "Plugin WordPress Santo do Dia",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpunit/phpunit": "^9.6",
+        "wp-coding-standards/wpcs": "^3.2"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true
+    },
+    "scripts": {
+        "lint": "phpcs --standard=phpcs.xml.dist",
+        "test": "phpunit",
+        "check": [
+            "@lint",
+            "@test"
+        ]
+    },
+    "archive": {
+        "exclude": [
+            "/.git",
+            "/.github",
+            "/.gitignore",
+            "/.distignore",
+            "/.phpunit.result.cache",
+            "/composer.json",
+            "/composer.lock",
+            "/phpcs.xml.dist",
+            "/phpunit.xml.dist",
+            "/README.md",
+            "/tests",
+            "/vendor"
+        ]
+    }
+}
