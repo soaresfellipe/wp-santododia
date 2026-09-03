@@ -1,0 +1,80 @@
+name: Check WordPress compatibility
+
+on:
+  schedule:
+    # Toda segunda-feira às 12:00 UTC (09:00 BRT)
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect latest WordPress version
+        id: wp
+        run: |
+          LATEST=$(curl -fsSL https://api.wordpress.org/core/version-check/1.7/ | jq -r '.offers[0].version')
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+          echo "Latest WordPress stable: $LATEST"
+
+      - name: Compare with plugin "Tested up to"
+        id: compare
+        run: |
+          TESTED=$(grep -m1 '^Tested up to:' README.txt | sed 's/^[^:]*: *//')
+          echo "tested=$TESTED" >> "$GITHUB_OUTPUT"
+          echo "Plugin Tested up to: $TESTED"
+          if [ "$TESTED" = "${{ steps.wp.outputs.latest }}" ]; then
+            echo "outdated=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "outdated=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open or update issue when outdated
+        if: steps.compare.outputs.outdated == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LATEST: ${{ steps.wp.outputs.latest }}
+          TESTED: ${{ steps.compare.outputs.tested }}
+        run: |
+          TITLE="Atualizar compatibilidade: WordPress ${LATEST} disponível (Tested up to: ${TESTED})"
+          BODY=$(cat <<EOF
+          Uma nova versão do WordPress foi detectada pelo workflow **Check WordPress compatibility**.
+
+          - **Versão estável atual do WordPress:** ${LATEST}
+          - **Tested up to do plugin:** ${TESTED}
+
+          Passos (ver \`notes/rotina-compatibilidade-wordpress.md\`):
+          1. Atualizar \`Tested up to:\` no \`README.txt\`.
+          2. Bumpar a versão do plugin (\`santododia.php\` + \`Stable tag\`) e adicionar changelog.
+          3. Rodar \`composer check\`.
+          4. Commitar no SVN do WordPress.org (trunk + tag).
+          5. Criar a release no GitHub.
+          EOF
+          )
+          EXISTING=$(gh issue list --state open --search "Atualizar compatibilidade in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue edit "$EXISTING" --title "$TITLE" --body "$BODY"
+            echo "Issue #$EXISTING atualizada."
+          else
+            gh issue create --title "$TITLE" --body "$BODY"
+            echo "Issue criada."
+          fi
+
+      - name: Close issue when up to date
+        if: steps.compare.outputs.outdated == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          EXISTING=$(gh issue list --state open --search "Atualizar compatibilidade in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue close "$EXISTING" --comment "Compatibilidade confirmada: o plugin já está marcado com a versão estável mais recente do WordPress."
+            echo "Issue #$EXISTING fechada."
+          else
+            echo "Plugin atualizado, nenhuma issue aberta."
+          fi
