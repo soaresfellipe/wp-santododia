@@ -4,7 +4,7 @@ Contributors: fellipesoares
 Donate link: https://fellipesoares.com.br/wp-santo-do-dia/
 Tags: catholic, saint
 Requires at least: 6.3
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 2.2.0
 License: GPLv2 or later
@@ -43,7 +43,7 @@ Entre em contato comigo por email: falecom [at] fellipesoares.com.br
 ### Changelog
 
 #### 2.2.0
-* Compatibilidade validada com WordPress 7.0 e PHP 7.4 ou superior.
+* Compatibilidade validada com WordPress 7.1 e PHP 7.4 ou superior.
 * Corrigido o evento de atualização diária e adicionada atualização automática para instalações existentes.
 * Reforçada a validação das respostas da API e o tratamento quando os dados estão indisponíveis.
 * Dados passam a ser removidos somente na desinstalação, não mais na desativação.

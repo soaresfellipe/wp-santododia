@@ -4,7 +4,7 @@ Contributors: fellipesoares
 Donate link: https://fellipesoares.com.br/wp-santo-do-dia/
 Tags: catholic, saint
 Requires at least: 6.3
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 2.2.0
 License: GPLv2 or later
@@ -38,7 +38,7 @@ Add the `[santododia]` shortcode to any supported content area.
 == Changelog ==
 
 = 2.2.0 =
-* Validated compatibility with WordPress 7.0 and PHP 7.4 or later.
+* Validated compatibility with WordPress 7.1 and PHP 7.4 or later.
 * Fixed the daily update event and added automatic upgrades for existing installations.
 * Strengthened API response validation and unavailable-data handling.
 * Preserved plugin data on deactivation and moved destructive cleanup to uninstall.
