@@ -48,7 +48,7 @@ jobs:
         run: |
           if [ "${{ matrix.php }}" = "8.2" ]; then
             vendor/bin/phpunit --log-junit build/junit.xml --coverage-filter santododia.php --coverage-clover build/clover.xml --coverage-text
-            php bin/coverage-check.php build/clover.xml 70
+            php bin/coverage-check.php build/clover.xml 90
           else
             vendor/bin/phpunit --log-junit build/junit.xml
           fi
