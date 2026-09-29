@@ -1,0 +1,34 @@
+name: Droid Auto Review
+
+# Revisão automática de PR pelo Factory Droid.
+# Requer o secret FACTORY_API_KEY e o app Factory Droid instalado no repositório.
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  droid-review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - uses: Factory-AI/droid-action@v9
+        with:
+          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+          automatic_review: true
+          automatic_security_review: true
+          allowed_bots: "dependabot,factory-droid"

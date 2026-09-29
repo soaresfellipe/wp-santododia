@@ -1,0 +1,31 @@
+name: Bug
+description: Algo não funciona como deveria
+labels: ["bug", "triagem"]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: O que aconteceu
+      description: O que você esperava e o que viu no lugar.
+    validations:
+      required: true
+  - type: textarea
+    id: passos
+    attributes:
+      label: Como reproduzir
+      placeholder: "1. Ative o plugin\n2. Adicione [santododia] a uma página\n3. ..."
+    validations:
+      required: true
+  - type: input
+    id: versoes
+    attributes:
+      label: Versões
+      placeholder: "Plugin 2.2.0, WordPress 7.1, PHP 8.2"
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Linhas do debug.log com "santo-do-dia" (com WP_DEBUG_LOG ligado), se houver.
+      render: json

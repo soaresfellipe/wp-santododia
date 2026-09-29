@@ -21,9 +21,78 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          coverage: none
+          # Cobertura só em um job da matriz para não atrasar os demais.
+          coverage: ${{ matrix.php == '8.2' && 'pcov' || 'none' }}
           tools: composer:v2
+
+      - name: Cache do Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-php${{ matrix.php }}-
 
       - run: composer install --no-interaction --prefer-dist
 
-      - run: composer check
+      - run: composer lint
+      - run: composer analyse
+      - run: composer deps
+      - run: composer dead
+      - run: composer docs
+
+      - name: Código duplicado
+        if: matrix.php == '8.2'
+        run: composer duplicates
+
+      - name: Testes
+        run: |
+          if [ "${{ matrix.php }}" = "8.2" ]; then
+            vendor/bin/phpunit --log-junit build/junit.xml --coverage-filter santododia.php --coverage-clover build/clover.xml --coverage-text
+            php bin/coverage-check.php build/clover.xml 70
+          else
+            vendor/bin/phpunit --log-junit build/junit.xml
+          fi
+
+      - name: Tempos dos testes
+        if: always()
+        run: |
+          php -r '$x = simplexml_load_file("build/junit.xml"); $c = array(); foreach ($x->xpath("//testcase") as $t) { $c[(string) $t["name"]] = (float) $t["time"]; } arsort($c); echo "| Teste | Tempo (s) |\n|---|---|\n"; foreach ($c as $n => $s) { printf("| %s | %.4f |\n", $n, $s); }' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports-php${{ matrix.php }}
+          path: build/
+
+  integration:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.4']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: pdo_sqlite
+          tools: composer:v2
+
+      - name: Cache do Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer/files
+          key: composer-${{ runner.os }}-php${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-php${{ matrix.php }}-
+
+      - name: Cache do WordPress de testes
+        uses: actions/cache@v4
+        with:
+          path: build/wp/wordpress
+          key: wp-tests-${{ hashFiles('bin/install-wp-tests.sh') }}
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer test:integration

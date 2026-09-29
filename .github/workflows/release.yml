@@ -1,0 +1,52 @@
+name: Release
+
+# Disparado ao enviar uma tag X.Y.Z. Confere a versão, roda as verificações, gera o zip
+# de distribuição e cria a release no GitHub com as notas do changelog do README.txt.
+# O envio ao SVN do WordPress.org só acontece com a variável de repositório
+# WPORG_DEPLOY=true e os secrets SVN_USERNAME / SVN_PASSWORD configurados.
+
+on:
+  push:
+    tags: ['[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+
+      - name: Notas e consistência da versão
+        run: php bin/release-notes.php "$GITHUB_REF_NAME" > release-notes.md
+
+      - run: composer install --no-interaction --prefer-dist
+      - run: composer check
+
+      - name: Zip de distribuição
+        run: |
+          mkdir -p build/santo-do-dia
+          rsync -a --exclude-from=.distignore --exclude=build --exclude=release-notes.md ./ build/santo-do-dia/
+          (cd build && zip -qr "santo-do-dia-${GITHUB_REF_NAME}.zip" santo-do-dia)
+          unzip -l "build/santo-do-dia-${GITHUB_REF_NAME}.zip"
+
+      - name: Release no GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "build/santo-do-dia-${GITHUB_REF_NAME}.zip" --title "$GITHUB_REF_NAME" --notes-file release-notes.md
+
+      - name: Publicar no WordPress.org
+        if: vars.WPORG_DEPLOY == 'true'
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: santo-do-dia
+          BUILD_DIR: build/santo-do-dia
