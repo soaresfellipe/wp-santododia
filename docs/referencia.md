@@ -7,7 +7,7 @@
 
 | Nome | Valor |
 |---|---|
-| `SANTO_DO_DIA_VERSION` | `'2.2.0'` |
+| `SANTO_DO_DIA_VERSION` | `'2.3.0'` |
 | `SANTO_DO_DIA_API_URL` | `'https://catolicoapp.com/wp-json/wp/v2/santos'` |
 | `SANTO_DO_DIA_API_PAUSE_KEY` | `'santo_do_dia_api_pausa'` |
 | `SANTO_DO_DIA_API_PAUSE_SECONDS` | `15 * 60` |
