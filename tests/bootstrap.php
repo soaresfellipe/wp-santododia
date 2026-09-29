@@ -47,6 +47,8 @@ class Santo_Do_Dia_Test_Wpdb {
 	}
 
 	public function get_var( $query ) {
+		$this->queries[] = $query;
+
 		if ( preg_match( '/dia = (\d+) AND mes = (\d+)/', $query, $matches ) ) {
 			return isset( $this->records[ $matches[1] . '_' . $matches[2] ] ) ? 1 : 0;
 		}
@@ -55,7 +57,8 @@ class Santo_Do_Dia_Test_Wpdb {
 	}
 
 	public function replace( $table, $data, $formats ) {
-		unset( $table, $formats );
+		unset( $formats );
+		$this->queries[] = 'REPLACE INTO ' . $table;
 
 		if ( false === $this->replace_result ) {
 			return false;
@@ -67,6 +70,8 @@ class Santo_Do_Dia_Test_Wpdb {
 	}
 
 	public function get_row( $query ) {
+		$this->queries[] = $query;
+
 		if ( preg_match( '/dia = (\d+) AND mes = (\d+)/', $query, $matches ) ) {
 			$key = $matches[1] . '_' . $matches[2];
 			if ( isset( $this->records[ $key ] ) ) {

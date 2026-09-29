@@ -21,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 define( 'SANTO_DO_DIA_VERSION', '2.2.0' );
 define( 'SANTO_DO_DIA_API_URL', 'https://catolicoapp.com/wp-json/wp/v2/santos' );
+define( 'SANTO_DO_DIA_API_PAUSE_KEY', 'santo_do_dia_api_pausa' );
+define( 'SANTO_DO_DIA_API_PAUSE_SECONDS', 15 * 60 );
 
 /**
  * Returns the plugin table name.
@@ -139,6 +141,64 @@ function santo_do_dia_error( $code, $message ) {
 }
 
 /**
+ * Removes query strings and e-mail addresses from a log message.
+ *
+ * @param string $message Raw message.
+ * @return string
+ */
+function santo_do_dia_scrub_log_message( $message ) {
+	$message = preg_replace( '#(https?://[^\s?\#]+)[?\#]\S*#i', '$1?[removido]', $message );
+
+	return preg_replace( '/[^\s@]+@[^\s@]+\.[^\s@]+/', '[email removido]', $message );
+}
+
+/**
+ * Writes plugin errors as one JSON line to debug.log when WP_DEBUG_LOG is on.
+ *
+ * @param WP_Error $error Error details.
+ * @return void
+ */
+function santo_do_dia_log_error( $error ) {
+	if ( ! defined( 'WP_DEBUG_LOG' ) || ! WP_DEBUG_LOG ) {
+		return;
+	}
+
+	list( $dia, $mes ) = santo_do_dia_current_date();
+
+	// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Only runs when WP_DEBUG_LOG is enabled.
+	error_log(
+		(string) wp_json_encode(
+			array(
+				'plugin'  => 'santo-do-dia',
+				'version' => SANTO_DO_DIA_VERSION,
+				'level'   => 'error',
+				'code'    => $error->get_error_code(),
+				'message' => santo_do_dia_scrub_log_message( $error->get_error_message() ),
+				'dia'     => $dia,
+				'mes'     => $mes,
+			)
+		)
+	);
+}
+add_action( 'santo_do_dia_api_error', 'santo_do_dia_log_error' );
+
+/**
+ * Reports an API failure and pauses non-forced requests for a while.
+ *
+ * Without the pause, every uncached page view would wait for the API timeout
+ * while the API is down.
+ *
+ * @param string $code    Stable error code.
+ * @param string $message Error message.
+ * @return WP_Error
+ */
+function santo_do_dia_api_failure( $code, $message ) {
+	set_transient( SANTO_DO_DIA_API_PAUSE_KEY, time(), SANTO_DO_DIA_API_PAUSE_SECONDS );
+
+	return santo_do_dia_error( $code, $message );
+}
+
+/**
  * Fetches and persists the saint for the current date.
  *
  * @param bool $force Whether an existing record should be refreshed.
@@ -163,6 +223,13 @@ function santo_do_dia_obter_dados( $force = false ) {
 		return true;
 	}
 
+	if ( ! $force && false !== get_transient( SANTO_DO_DIA_API_PAUSE_KEY ) ) {
+		return new WP_Error(
+			'santo_do_dia_api_paused',
+			__( 'A API do Santo do Dia falhou recentemente; nova tentativa em breve.', 'santo-do-dia' )
+		);
+	}
+
 	$url      = add_query_arg(
 		array(
 			'dia' => $dia,
@@ -181,11 +248,11 @@ function santo_do_dia_obter_dados( $force = false ) {
 	);
 
 	if ( is_wp_error( $response ) ) {
-		return santo_do_dia_error( 'santo_do_dia_http_error', $response->get_error_message() );
+		return santo_do_dia_api_failure( 'santo_do_dia_http_error', $response->get_error_message() );
 	}
 
 	if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
-		return santo_do_dia_error(
+		return santo_do_dia_api_failure(
 			'santo_do_dia_http_status',
 			__( 'A API do Santo do Dia retornou uma resposta inesperada.', 'santo-do-dia' )
 		);
@@ -204,7 +271,7 @@ function santo_do_dia_obter_dados( $force = false ) {
 		|| ! is_string( $dados[0]['imagem_destacada'] )
 		|| ! is_string( $dados[0]['link'] )
 	) {
-		return santo_do_dia_error(
+		return santo_do_dia_api_failure(
 			'santo_do_dia_invalid_response',
 			__( 'A API do Santo do Dia retornou dados inválidos.', 'santo-do-dia' )
 		);
@@ -219,7 +286,7 @@ function santo_do_dia_obter_dados( $force = false ) {
 	$link   = esc_url_raw( $dados[0]['link'], array( 'http', 'https' ) );
 
 	if ( '' === $nome || ! wp_http_validate_url( $imagem ) || ! wp_http_validate_url( $link ) ) {
-		return santo_do_dia_error(
+		return santo_do_dia_api_failure(
 			'santo_do_dia_invalid_fields',
 			__( 'A API do Santo do Dia retornou campos inválidos.', 'santo-do-dia' )
 		);
@@ -245,6 +312,7 @@ function santo_do_dia_obter_dados( $force = false ) {
 		);
 	}
 
+	delete_transient( SANTO_DO_DIA_API_PAUSE_KEY );
 	delete_transient( 'santo_do_dia_html_' . $dia . '_' . $mes );
 
 	return true;
@@ -253,10 +321,10 @@ function santo_do_dia_obter_dados( $force = false ) {
 /**
  * Refreshes the current record during the daily cron job.
  *
- * @return true|WP_Error
+ * @return void
  */
 function santo_do_dia_atualizar_dados() {
-	return santo_do_dia_obter_dados( true );
+	santo_do_dia_obter_dados( true );
 }
 add_action( 'santo_do_dia_cron_diario', 'santo_do_dia_atualizar_dados' );
 
@@ -424,6 +492,7 @@ function santo_do_dia_uninstall() {
 		)
 	);
 
+	delete_transient( SANTO_DO_DIA_API_PAUSE_KEY );
 	delete_option( 'santo_do_dia_version' );
 	wp_clear_scheduled_hook( 'santo_do_dia_cron_diario' );
 	wp_clear_scheduled_hook( 'santo_do_dia_cron_fallback' );

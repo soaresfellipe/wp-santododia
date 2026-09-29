@@ -50,7 +50,7 @@ final class SantoDoDiaTest extends TestCase {
 			'https://example.test/nova'
 		);
 
-		$this->assertTrue( santo_do_dia_atualizar_dados() );
+		santo_do_dia_atualizar_dados();
 		$this->assertSame( 1, $GLOBALS['santo_do_dia_remote_calls'] );
 		$this->assertSame( 'Santa Clara atualizada', $GLOBALS['wpdb']->records['12_8']['nome'] );
 	}
@@ -78,6 +78,51 @@ final class SantoDoDiaTest extends TestCase {
 		$this->assertSame( 'santo_do_dia_http_error', $result->get_error_code() );
 	}
 
+	public function test_pauses_non_forced_requests_after_an_api_failure(): void {
+		$GLOBALS['santo_do_dia_remote_response'] = new WP_Error( 'timeout', 'Timed out' );
+
+		santo_do_dia_obter_dados();
+		$this->assertSame( 1, $GLOBALS['santo_do_dia_remote_calls'] );
+		$this->assertSame( 15 * 60, $GLOBALS['santo_do_dia_transient_expirations']['santo_do_dia_api_pausa'] );
+
+		$result = santo_do_dia_obter_dados();
+		$this->assertSame( 'santo_do_dia_api_paused', $result->get_error_code() );
+		$this->assertSame( 1, $GLOBALS['santo_do_dia_remote_calls'], 'Com o circuito aberto não há chamada remota.' );
+
+		$GLOBALS['santo_do_dia_remote_response'] = $this->validResponse(
+			'Santa Clara',
+			'https://example.test/clara.jpg',
+			'https://example.test/clara'
+		);
+
+		$this->assertTrue( santo_do_dia_obter_dados( true ), 'O cron diário (forçado) ignora a pausa.' );
+		$this->assertSame( 2, $GLOBALS['santo_do_dia_remote_calls'] );
+		$this->assertArrayNotHasKey( 'santo_do_dia_api_pausa', $GLOBALS['santo_do_dia_transients'] );
+	}
+
+	public function test_logs_errors_as_scrubbed_json_when_debug_log_is_on(): void {
+		if ( ! defined( 'WP_DEBUG_LOG' ) ) {
+			define( 'WP_DEBUG_LOG', true );
+		}
+
+		$log      = tempnam( sys_get_temp_dir(), 'santo' );
+		$previous = ini_set( 'error_log', $log );
+
+		santo_do_dia_log_error(
+			new WP_Error( 'santo_do_dia_http_error', 'Falha em https://api.test/x?token=abc para fulano@example.com' )
+		);
+
+		ini_set( 'error_log', (string) $previous );
+		$line = trim( (string) file_get_contents( $log ) );
+		unlink( $log );
+
+		$entry = json_decode( substr( $line, (int) strpos( $line, '{' ) ), true );
+		$this->assertSame( 'santo_do_dia_http_error', $entry['code'] );
+		$this->assertSame( 'Falha em https://api.test/x?[removido] para [email removido]', $entry['message'] );
+		$this->assertSame( 12, $entry['dia'] );
+		$this->assertSame( 8, $entry['mes'] );
+	}
+
 	public function test_renders_and_caches_escaped_card_markup(): void {
 		$GLOBALS['wpdb']->records['12_8'] = $this->record(
 			'Clara <script>alert(1)</script>',
@@ -91,6 +136,26 @@ final class SantoDoDiaTest extends TestCase {
 		$this->assertStringContainsString( 'rel="noopener noreferrer"', $html );
 		$this->assertStringContainsString( 'loading="lazy"', $html );
 		$this->assertSame( $html, $GLOBALS['santo_do_dia_transients']['santo_do_dia_html_12_8'] );
+	}
+
+	public function test_rendering_keeps_a_fixed_query_budget(): void {
+		$GLOBALS['santo_do_dia_remote_response'] = $this->validResponse(
+			'Santa Clara',
+			'https://example.test/clara.jpg',
+			'https://example.test/clara'
+		);
+
+		santo_do_dia();
+		$this->assertCount( 4, $GLOBALS['wpdb']->queries, 'Sem dados: lê, confere, grava e relê.' );
+
+		$GLOBALS['wpdb']->queries           = array();
+		$GLOBALS['santo_do_dia_transients'] = array();
+		santo_do_dia();
+		$this->assertCount( 1, $GLOBALS['wpdb']->queries, 'Com dados e sem cache: uma leitura.' );
+
+		$GLOBALS['wpdb']->queries = array();
+		santo_do_dia();
+		$this->assertCount( 0, $GLOBALS['wpdb']->queries, 'Com cache: nenhuma query.' );
 	}
 
 	public function test_returns_safe_fallback_when_data_remains_unavailable(): void {
