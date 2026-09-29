@@ -1,0 +1,38 @@
+name: SVN - remover .git da raiz
+
+# Uso único: remove a pasta .git/ publicada por engano na raiz do SVN do WordPress.org.
+# Só age sobre santo-do-dia/.git; trunk/, tags/ e assets/ não são tocados.
+# Apagar este workflow depois da execução.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: 'Digite REMOVER para apagar santo-do-dia/.git do SVN'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  remover:
+    if: inputs.confirmar == 'REMOVER'
+    runs-on: ubuntu-latest
+    env:
+      ALVO: https://plugins.svn.wordpress.org/santo-do-dia/.git
+    steps:
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq subversion
+
+      - name: Conferir alvo
+        run: |
+          svn info "$ALVO" | grep -E '^(URL|Node Kind|Last Changed Rev|Last Changed Date):'
+          svn ls "$ALVO" | head -20
+
+      - name: Remover
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        run: |
+          svn delete "$ALVO" -m "Remove pasta .git publicada por engano" \
+            --username "$SVN_USERNAME" --password "$SVN_PASSWORD" --non-interactive --no-auth-cache
+          svn ls https://plugins.svn.wordpress.org/santo-do-dia/
