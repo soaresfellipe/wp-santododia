@@ -2,6 +2,8 @@ name: Droid Auto Review
 
 # Revisão automática de PR pelo Factory Droid.
 # Requer o secret FACTORY_API_KEY e o app Factory Droid instalado no repositório.
+# PRs de fork não recebem secrets no evento pull_request, então o job é pulado para eles.
+# Não troque para pull_request_target: isso exporia a chave a código de terceiros.
 
 on:
   pull_request:
@@ -13,7 +15,7 @@ concurrency:
 
 jobs:
   droid-review:
-    if: github.event.pull_request.draft == false
+    if: github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: write
