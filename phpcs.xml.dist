@@ -13,5 +13,19 @@
 	<rule ref="WordPress-Extra"/>
 	<rule ref="WordPress.Security"/>
 
+	<!-- Complexidade: avisa acima de 10 e reprova acima de 15. -->
+	<rule ref="Generic.Metrics.CyclomaticComplexity">
+		<properties>
+			<property name="complexity" value="10"/>
+			<property name="absoluteComplexity" value="15"/>
+		</properties>
+	</rule>
+	<rule ref="Generic.Metrics.NestingLevel">
+		<properties>
+			<property name="nestingLevel" value="4"/>
+			<property name="absoluteNestingLevel" value="6"/>
+		</properties>
+	</rule>
+
 	<config name="minimum_supported_wp_version" value="6.3"/>
 </ruleset>

@@ -1,0 +1,10 @@
+{
+	"threshold": 3,
+	"minLines": 8,
+	"minTokens": 60,
+	"format": ["php"],
+	"path": ["santododia.php", "bin"],
+	"reporters": ["console"],
+	"absolute": false,
+	"gitignore": true
+}
