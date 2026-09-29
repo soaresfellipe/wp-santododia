@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit
+	bootstrap="tests/integration/bootstrap.php"
+	colors="true"
+	failOnRisky="true"
+	failOnWarning="true"
+>
+	<testsuites>
+		<testsuite name="WP Santo do Dia (integração)">
+			<directory suffix="Test.php">tests/integration</directory>
+		</testsuite>
+	</testsuites>
+</phpunit>
