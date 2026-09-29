@@ -10,3 +10,16 @@
 /README.md
 /tests
 /vendor
+/.wp-env.json
+/AGENTS.md
+/phpstan.neon.dist
+/notes
+/.githooks
+/composer-dependency-analyser.php
+/bin
+/docs
+/.devcontainer
+/.claude
+/AGENT_READINESS_REPORT.md
+/.jscpd.json
+/phpunit-integration.xml.dist
