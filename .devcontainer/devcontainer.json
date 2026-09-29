@@ -1,0 +1,20 @@
+{
+	"name": "WP Santo do Dia",
+	"image": "mcr.microsoft.com/devcontainers/php:1-8.2-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+	"postCreateCommand": "composer install --no-interaction",
+	"forwardPorts": [ 8888 ],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"bmewburn.vscode-intelephense-client",
+				"shevaua.phpcs",
+				"SanderRonde.phpstan-vscode"
+			]
+		}
+	}
+}

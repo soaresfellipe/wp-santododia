@@ -1,0 +1,36 @@
+name: Flaky tests
+
+# Repete a suíte em ordem aleatória para expor testes instáveis ou dependentes de ordem.
+# Falha aqui com a CI normal verde indica teste flaky: reproduza com a seed impressa
+# (vendor/bin/phpunit --random-order-seed <seed>).
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  repeat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: composer:v2
+
+      - run: composer install --no-interaction --prefer-dist
+
+      - name: 20 rodadas em ordem aleatória, 5 repetições cada
+        run: |
+          for run in $(seq 1 20); do
+            seed=$RANDOM
+            echo "::group::Rodada $run (seed $seed)"
+            vendor/bin/phpunit --random-order-seed "$seed" --repeat 5 || { echo "::error::Falha com seed $seed"; exit 1; }
+            echo "::endgroup::"
+          done

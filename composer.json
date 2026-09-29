@@ -4,35 +4,79 @@
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "require-dev": {
+        "ext-filter": "*",
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^9.6",
-        "wp-coding-standards/wpcs": "^3.2"
+        "shipmonk/composer-dependency-analyser": "^1.8",
+        "szepeviktor/phpstan-wordpress": "^2.0",
+        "wp-coding-standards/wpcs": "^3.2",
+        "wp-phpunit/wp-phpunit": "^7.1",
+        "yoast/phpunit-polyfills": "^4.0"
     },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "7.4.0"
+        }
     },
     "scripts": {
         "lint": "phpcs --standard=phpcs.xml.dist",
+        "format": "phpcbf --standard=phpcs.xml.dist",
+        "analyse": "phpstan analyse --memory-limit=1G",
+        "deps": "composer-dependency-analyser",
+        "dead": "@php bin/check-dead-code.php",
+        "duplicates": "npx --yes jscpd@4.3.0",
         "test": "phpunit",
+        "test:integration": [
+            "bin/install-wp-tests.sh",
+            "phpunit -c phpunit-integration.xml.dist"
+        ],
+        "docs": [
+            "@php bin/check-agents-md.php",
+            "@php bin/generate-reference.php --check"
+        ],
+        "reference": "@php bin/generate-reference.php",
         "check": [
             "@lint",
+            "@analyse",
+            "@deps",
+            "@dead",
+            "@docs",
             "@test"
+        ],
+        "hooks": "git config core.hooksPath .githooks",
+        "post-install-cmd": [
+            "@hooks"
         ]
     },
     "archive": {
         "exclude": [
+            "/.claude",
+            "/.devcontainer",
+            "/composer-dependency-analyser.php",
+            "/bin",
+            "/build",
             "/.git",
+            "/.githooks",
             "/.github",
             "/.gitignore",
             "/.distignore",
+            "/.jscpd.json",
             "/.phpunit.result.cache",
             "/composer.json",
             "/composer.lock",
+            "/docs",
+            "/notes",
             "/phpcs.xml.dist",
+            "/phpstan.neon.dist",
             "/phpunit.xml.dist",
+            "/phpunit-integration.xml.dist",
+            "/.wp-env.json",
+            "/AGENTS.md",
             "/README.md",
             "/tests",
             "/vendor"

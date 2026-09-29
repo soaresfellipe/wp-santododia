@@ -1,0 +1,14 @@
+name: Melhoria
+description: Sugestão de recurso ou mudança
+labels: ["enhancement", "triagem"]
+body:
+  - type: textarea
+    id: motivo
+    attributes:
+      label: Problema ou necessidade
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Proposta

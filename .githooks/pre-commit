@@ -1,0 +1,4 @@
+#!/bin/sh
+# Roda as mesmas verificações da CI antes de cada commit.
+# Ative com: composer hooks  (ou git config core.hooksPath .githooks)
+exec composer check

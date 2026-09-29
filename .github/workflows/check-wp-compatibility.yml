@@ -26,10 +26,13 @@ jobs:
       - name: Compare with plugin "Tested up to"
         id: compare
         run: |
-          TESTED=$(grep -m1 '^Tested up to:' README.txt | sed 's/^[^:]*: *//')
+          TESTED=$(grep -m1 '^Tested up to:' README.txt | sed 's/^[^:]*: *//' | tr -d '\r')
           echo "tested=$TESTED" >> "$GITHUB_OUTPUT"
           echo "Plugin Tested up to: $TESTED"
-          if [ "$TESTED" = "${{ steps.wp.outputs.latest }}" ]; then
+          # O WordPress.org usa só major.minor no "Tested up to"; versões de correção não contam.
+          LATEST_MINOR=$(echo "${{ steps.wp.outputs.latest }}" | cut -d. -f1,2)
+          TESTED_MINOR=$(echo "$TESTED" | cut -d. -f1,2)
+          if [ "$TESTED_MINOR" = "$LATEST_MINOR" ]; then
             echo "outdated=false" >> "$GITHUB_OUTPUT"
           else
             echo "outdated=true" >> "$GITHUB_OUTPUT"

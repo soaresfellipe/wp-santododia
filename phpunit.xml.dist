@@ -5,10 +5,13 @@
 	beStrictAboutOutputDuringTests="true"
 	failOnRisky="true"
 	failOnWarning="true"
+	executionOrder="random"
+	resolveDependencies="true"
 >
 	<testsuites>
 		<testsuite name="WP Santo do Dia">
 			<directory suffix="Test.php">tests</directory>
+			<exclude>tests/integration</exclude>
 		</testsuite>
 	</testsuites>
 </phpunit>

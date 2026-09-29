@@ -39,3 +39,12 @@ intermediate
 cache
 vendor/
 .phpunit.result.cache
+
+# Ambiente local e artefatos
+.env
+.env.*
+!.env.example
+node_modules/
+.wp-env.override.json
+/build/
+*.zip
