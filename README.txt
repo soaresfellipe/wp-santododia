@@ -6,7 +6,7 @@ Tags: catholic, saint
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,11 @@ Yes. No manual content management is required.
 Add the `[santododia]` shortcode to any supported content area.
 
 == Changelog ==
+
+= 2.3.0 =
+* Pauses API requests for 15 minutes after a failure, so pages no longer wait for the API timeout while it is down.
+* Logs plugin errors as JSON lines in debug.log when WP_DEBUG_LOG is enabled, without query strings or e-mail addresses.
+* Removes the pending API pause on uninstall.
 
 = 2.2.0 =
 * Validated compatibility with WordPress 7.1 and PHP 7.4 or later.

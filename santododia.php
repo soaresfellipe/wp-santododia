@@ -3,7 +3,7 @@
  * Plugin Name: Santo do Dia
  * Plugin URI: https://fellipesoares.com.br/wp-santo-do-dia
  * Description: Exiba o Santo do dia através do shortcode [santododia].
- * Version: 2.2.0
+ * Version: 2.3.0
  * Requires at least: 6.3
  * Requires PHP: 7.4
  * Author: Fellipe Soares
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SANTO_DO_DIA_VERSION', '2.2.0' );
+define( 'SANTO_DO_DIA_VERSION', '2.3.0' );
 define( 'SANTO_DO_DIA_API_URL', 'https://catolicoapp.com/wp-json/wp/v2/santos' );
 define( 'SANTO_DO_DIA_API_PAUSE_KEY', 'santo_do_dia_api_pausa' );
 define( 'SANTO_DO_DIA_API_PAUSE_SECONDS', 15 * 60 );

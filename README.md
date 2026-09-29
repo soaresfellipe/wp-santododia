@@ -6,7 +6,7 @@ Tags: catholic, saint
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,6 +41,11 @@ Entre em contato comigo por email: falecom [at] fellipesoares.com.br
 
 
 ### Changelog
+
+#### 2.3.0
+* Após uma falha da API, novas tentativas ficam pausadas por 15 minutos; as páginas não esperam mais o timeout enquanto a API está fora.
+* Erros do plugin são registrados como JSON no debug.log quando o WP_DEBUG_LOG está ligado, sem query strings nem e-mails.
+* A pausa pendente da API é removida na desinstalação.
 
 #### 2.2.0
 * Compatibilidade validada com WordPress 7.1 e PHP 7.4 ou superior.
