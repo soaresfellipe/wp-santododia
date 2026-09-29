@@ -194,6 +194,91 @@ final class SantoDoDiaTest extends TestCase {
 		);
 	}
 
+	public function test_install_creates_table_schedules_jobs_and_fetches(): void {
+		$GLOBALS['santo_do_dia_scheduled']       = array();
+		$GLOBALS['santo_do_dia_dbdelta']         = array();
+		$GLOBALS['santo_do_dia_remote_response'] = $this->validResponse(
+			'Santa Clara',
+			'https://example.test/clara.jpg',
+			'https://example.test/clara'
+		);
+
+		santo_do_dia_install();
+
+		$this->assertStringContainsString( 'CREATE TABLE wp_santo_do_dia', $GLOBALS['santo_do_dia_dbdelta'][0] );
+		$this->assertSame( 'daily', $GLOBALS['santo_do_dia_scheduled']['santo_do_dia_cron_diario'][1] );
+		$this->assertSame( 'sixhours', $GLOBALS['santo_do_dia_scheduled']['santo_do_dia_cron_fallback'][1] );
+		$this->assertSame( SANTO_DO_DIA_VERSION, $GLOBALS['santo_do_dia_options']['santo_do_dia_version'] );
+		$this->assertSame( 'Santa Clara', $GLOBALS['wpdb']->records['12_8']['nome'] );
+	}
+
+	public function test_upgrade_runs_only_when_the_stored_version_differs(): void {
+		$GLOBALS['santo_do_dia_dbdelta']                         = array();
+		$GLOBALS['santo_do_dia_options']['santo_do_dia_version'] = SANTO_DO_DIA_VERSION;
+
+		santo_do_dia_maybe_upgrade();
+		$this->assertEmpty( $GLOBALS['santo_do_dia_dbdelta'] );
+
+		$GLOBALS['santo_do_dia_options']['santo_do_dia_version'] = '2.1.0';
+		santo_do_dia_maybe_upgrade();
+		$this->assertCount( 1, $GLOBALS['santo_do_dia_dbdelta'] );
+		$this->assertSame( SANTO_DO_DIA_VERSION, $GLOBALS['santo_do_dia_options']['santo_do_dia_version'] );
+	}
+
+	public function test_fallback_job_fetches_only_when_the_record_is_missing(): void {
+		$GLOBALS['wpdb']->records['12_8'] = $this->record();
+
+		santo_do_dia_verificar_dados();
+		$this->assertSame( 0, $GLOBALS['santo_do_dia_remote_calls'] );
+
+		unset( $GLOBALS['wpdb']->records['12_8'] );
+		$GLOBALS['santo_do_dia_remote_response'] = $this->validResponse(
+			'Santa Clara',
+			'https://example.test/clara.jpg',
+			'https://example.test/clara'
+		);
+		santo_do_dia_verificar_dados();
+		$this->assertSame( 1, $GLOBALS['santo_do_dia_remote_calls'] );
+	}
+
+	public function test_registers_six_hour_schedule(): void {
+		$schedules = santo_do_dia_cron_schedules( array() );
+
+		$this->assertSame( 6 * HOUR_IN_SECONDS, $schedules['sixhours']['interval'] );
+	}
+
+	public function test_rejects_non_200_status_and_invalid_fields(): void {
+		$GLOBALS['santo_do_dia_remote_response'] = array( 'response' => array( 'code' => 500 ) );
+		$this->assertSame( 'santo_do_dia_http_status', santo_do_dia_obter_dados( true )->get_error_code() );
+
+		$GLOBALS['santo_do_dia_remote_response'] = $this->validResponse( 'Santa Clara', 'nao-e-url', 'https://example.test/clara' );
+		$this->assertSame( 'santo_do_dia_invalid_fields', santo_do_dia_obter_dados( true )->get_error_code() );
+	}
+
+	public function test_reports_database_errors_without_pausing_the_api(): void {
+		$GLOBALS['wpdb']->replace_result         = false;
+		$GLOBALS['santo_do_dia_remote_response'] = $this->validResponse(
+			'Santa Clara',
+			'https://example.test/clara.jpg',
+			'https://example.test/clara'
+		);
+
+		$this->assertSame( 'santo_do_dia_database_error', santo_do_dia_obter_dados()->get_error_code() );
+		$this->assertArrayNotHasKey( 'santo_do_dia_api_pausa', $GLOBALS['santo_do_dia_transients'] );
+	}
+
+	public function test_enqueues_style_only_on_posts_with_the_shortcode(): void {
+		$GLOBALS['santo_do_dia_enqueued_styles'] = array();
+		$GLOBALS['post']                         = null;
+		santo_do_dia_enqueue_scripts();
+		$this->assertEmpty( $GLOBALS['santo_do_dia_enqueued_styles'] );
+
+		$GLOBALS['post'] = new WP_Post( '<p>[santododia]</p>' );
+		santo_do_dia_enqueue_scripts();
+		$this->assertSame( 'santododia-style', $GLOBALS['santo_do_dia_enqueued_styles'][0][0] );
+		unset( $GLOBALS['post'] );
+	}
+
 	private function validResponse( string $name, string $image, string $link ): array {
 		return array(
 			'response' => array( 'code' => 200 ),

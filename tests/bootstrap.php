@@ -21,6 +21,14 @@ class WP_Error {
 	}
 }
 
+class WP_Post {
+	public $post_content;
+
+	public function __construct( $post_content ) {
+		$this->post_content = $post_content;
+	}
+}
+
 class Santo_Do_Dia_Test_Wpdb {
 	public $prefix = 'wp_';
 	public $options = 'wp_options';
