@@ -58,7 +58,7 @@ jobs:
         run: |
           php -r '$x = simplexml_load_file("build/junit.xml"); $c = array(); foreach ($x->xpath("//testcase") as $t) { $c[(string) $t["name"]] = (float) $t["time"]; } arsort($c); echo "| Teste | Tempo (s) |\n|---|---|\n"; foreach ($c as $n => $s) { printf("| %s | %.4f |\n", $n, $s); }' >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: test-reports-php${{ matrix.php }}
