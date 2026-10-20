@@ -19,7 +19,7 @@ jobs:
     container:
       image: semgrep/semgrep
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Análise (PHP e WordPress)
         run: semgrep scan --config p/php --config p/phpcs-security-audit --config p/secrets --sarif --output semgrep.sarif --error --exclude vendor --exclude tests
