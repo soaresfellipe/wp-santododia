@@ -1,0 +1,50 @@
+# Revisão automática da Factory (Droid) em todo PR: code review e security review.
+# Só comenta e aprova. Quem barra o merge continua sendo o CI.
+name: Revisão Droid
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: droid-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  droid-review:
+    name: revisão droid
+    # Pula rascunho e PR de fork (fork não recebe o segredo FACTORY_API_KEY).
+    if: github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write   # necessário para o token do GitHub App "Factory Droid"
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Revisão de código e de segurança (Droid)
+        uses: Factory-AI/droid-action@260eac443df653198ed70e9ea9d32980cfabde23 # v13
+        with:
+          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+          # Code review: modelo e esforço pedidos pelo Fellipe.
+          automatic_review: true
+          review_model: gpt-6-luna-fast
+          # Security review: STRIDE/OWASP/cadeia de suprimentos em todo PR.
+          automatic_security_review: true
+          security_model: gpt-6-luna
+          # Um único reasoning_effort vale para as duas revisões.
+          reasoning_effort: max
+          security_severity_threshold: medium
+          security_block_on_critical: true
+          # Revisa também os PRs do Dependabot.
+          allowed_bots: "dependabot"
