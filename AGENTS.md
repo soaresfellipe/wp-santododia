@@ -11,6 +11,7 @@ dependências: `docs/arquitetura.md`.
 - Composer 2
 - Para rodar o plugin num WordPress local: Docker e Node.js (para o `@wordpress/env`)
 - Ou abra o repositório no devcontainer (`.devcontainer/devcontainer.json`), que já traz tudo isso.
+- Cloud Agents: `.cursor/environment.json` (imagem com PHP, Composer 2 e Node; `install` roda `composer install`).
 
 ## Do clone ao verde
 
