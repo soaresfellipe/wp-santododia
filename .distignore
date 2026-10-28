@@ -19,6 +19,7 @@
 /bin
 /docs
 /.devcontainer
+/.cursor
 /.claude
 /AGENT_READINESS_REPORT.md
 /.jscpd.json
