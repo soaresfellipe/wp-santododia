@@ -1,4 +1,4 @@
-FROM php:8.2-cli
+FROM php:8.3-cli
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG NODE_VERSION=22.12.0
