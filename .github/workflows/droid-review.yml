@@ -38,10 +38,10 @@ jobs:
           factory_api_key: ${{ secrets.FACTORY_API_KEY }}
           # Code review: modelo e esforço pedidos pelo Fellipe.
           automatic_review: true
-          review_model: gpt-6-luna-fast
+          review_model: deepseek-v4.1-flash-1017
           # Security review: STRIDE/OWASP/cadeia de suprimentos em todo PR.
           automatic_security_review: true
-          security_model: gpt-6-luna
+          security_model: deepseek-v4.1-flash-1017
           # Um único reasoning_effort vale para as duas revisões.
           reasoning_effort: max
           security_severity_threshold: medium
