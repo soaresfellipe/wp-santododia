@@ -38,7 +38,7 @@ jobs:
           factory_api_key: ${{ secrets.FACTORY_API_KEY }}
           # Code review: modelo e esforço pedidos pelo Fellipe.
           automatic_review: true
-          review_model: gpt-6-luna-fast
+          review_model: gpt-6-luna
           # Security review: STRIDE/OWASP/cadeia de suprimentos em todo PR.
           automatic_security_review: true
           security_model: gpt-6-luna
