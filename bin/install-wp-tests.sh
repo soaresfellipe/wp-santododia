@@ -4,7 +4,7 @@
 set -eu
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-WP_VERSION=${1:-7.1}
+WP_VERSION=${1:-7.1.4}
 DIR="$ROOT/build/wp"
 CORE="$DIR/wordpress"
 
